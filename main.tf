@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.0"
 
   backend "local" {
-    path = "terraform.tfstate" # Use S3 for production
+    path = "terraform.tfstate"
   }
 }
 

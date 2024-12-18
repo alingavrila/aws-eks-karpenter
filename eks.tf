@@ -29,5 +29,5 @@ resource "aws_eks_cluster" "eks_cluster" {
     )
   }
 
-  version = "1.29" # Use the latest Kubernetes version
+  version = "1.31"
 }
