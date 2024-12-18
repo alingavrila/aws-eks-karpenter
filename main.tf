@@ -1,36 +1,27 @@
-resource "aws_iam_role" "eks_cluster_role" {
-  name = "${var.cluster_name}-eks-cluster-role"
+terraform {
+  required_version = ">= 1.0"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action    = "sts:AssumeRole"
-        Principal = { Service = "eks.amazonaws.com" }
-        Effect    = "Allow"
-        Sid       = ""
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
-  role       = aws_iam_role.eks_cluster_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-}
-
-resource "aws_eks_cluster" "eks_cluster" {
-  name     = var.cluster_name
-  role_arn = aws_iam_role.eks_cluster_role.arn
-
-  vpc_config {
-    subnet_ids = var.private_subnet_ids
+  backend "local" {
+    path = "terraform.tfstate" # Use S3 for production
   }
-
-  version = "1.29" # Use the latest Kubernetes version
 }
 
-output "cluster_endpoint" {
-  description = "EKS Cluster endpoint"
-  value       = aws_eks_cluster.eks_cluster.endpoint
+provider "aws" {
+  region = var.aws_region
+}
+
+provider "kubernetes" {
+  host                   = aws_eks_cluster.eks_cluster.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.eks_cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = aws_eks_cluster.eks_cluster.name
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
 }

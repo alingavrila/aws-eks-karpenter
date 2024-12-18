@@ -41,9 +41,11 @@ resource "helm_release" "karpenter" {
     name  = "aws.defaultInstanceProfile"
     value = aws_iam_role.karpenter_node_role.name
   }
+
+  depends_on = [aws_eks_cluster.eks_cluster]
 }
 
-# Provisioner configuration for Graviton and Spot instances
+
 resource "kubernetes_manifest" "karpenter_provisioner" {
   manifest = {
     "apiVersion" = "karpenter.sh/v1alpha5"
@@ -59,4 +61,6 @@ resource "kubernetes_manifest" "karpenter_provisioner" {
       "limits" = { "resources" = { "cpu" = "100", "memory" = "500Gi" } }
     }
   }
+
+  depends_on = [helm_release.karpenter]
 }

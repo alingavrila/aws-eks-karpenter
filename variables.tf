@@ -1,27 +1,23 @@
 variable "aws_region" {
-  description = "AWS region for resources"
+  description = "AWS region to deploy resources"
   type        = string
   default     = "us-east-1"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
-  default     = "my-eks-cluster"
-}
-
-variable "existing_vpc_id" {
-  description = "The existing VPC ID"
-  type        = string
-}
-
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs"
-  type        = list(string)
+  default     = "eks-cluster"
 }
 
 variable "karpenter_version" {
-  description = "Karpenter Helm chart version"
+  description = "Version of the Karpenter Helm chart"
   type        = string
-  default     = "v0.35.0"
+  default     = "v1.1.0"
 }
